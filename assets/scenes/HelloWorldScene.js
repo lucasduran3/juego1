@@ -4,7 +4,7 @@ export default class HelloWorldScene extends Phaser.Scene {
   constructor() {
     // key of the scene
     // the key will be used to start the scene by other scenes
-    super("hello-world");
+    super("hello-world"); //super llama al construvtor de la clase padre
   }
 
   init() {
