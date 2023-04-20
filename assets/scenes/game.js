@@ -21,7 +21,7 @@ export default class Game extends Phaser.Scene {
     //add static platforms group
     let platforms = this.physics.add.staticGroup();
     platforms.create(400, 568, "ground").setScale(2).refreshBody();
-    //add spites player
+    //add sprites player
     this.player = this.physics.add.sprite(100, 450, "ninja");
     this.player.setCollideWorldBounds(true);
     //add shapes group
