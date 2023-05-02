@@ -39,14 +39,10 @@ export default class Game extends Phaser.Scene {
 
     //add sprites player
     this.player = this.physics.add.sprite(100, 450, "ninja");
-    this.player.setCollideWorldBounds(true);
+    this.player.setCollideWorldBounds(true);//colisione con los limites del juego
 
     //add shapes group
     this.shapesGroup = this.physics.add.group();
-    /*this.shapesGroup.create(100, 0, 'diamond');
-    this.shapesGroup.create(200, 0, 'triangle');
-    this.shapesGroup.create(300, 0, 'square');*/
-    //this.addShape();
 
     //create events to add shapes
     this.time.addEvent({
@@ -102,7 +98,7 @@ export default class Game extends Phaser.Scene {
     const randomShape = Phaser.Math.RND.pick([DIAMOND, SQUARE, TRIANGLE]); //selecciona aleatoriamente una forma
 
     //get random position x
-    const randomX = Phaser.Math.RND.between(0, 800);
+    const randomX = Phaser.Math.RND.between(32, 768);
 
     // add shape to screen
     this.shapesGroup.create(randomX, 0, randomShape).setCircle(25,7,7);;  
@@ -113,7 +109,7 @@ export default class Game extends Phaser.Scene {
   collectShape(player, shape){
     //remove shape from screen
     shape.disableBody(true, true);
-    const shapeName = shape.texture.key;
+    const shapeName = shape.texture.key; 
     this.shapesRecolected[shapeName].count++;
 
     this.score += this.shapesRecolected[shapeName].score;
