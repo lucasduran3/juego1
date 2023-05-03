@@ -1,14 +1,19 @@
 import {SHAPES} from '../../util.js';
+
 const {TRIANGLE, SQUARE, DIAMOND} = SHAPES;
+
 
 export default class Game extends Phaser.Scene {
   //export default para poder importar desde otra clase
   score;
+  gameOver;
+  timer;
   constructor() {
-    super("game");
+    super("Game");
   }
 
   init() {
+    this.gameOver = false;
     this.shapesRecolected = {
       [TRIANGLE]: {count: 0, score: 10},
       [SQUARE]: {count: 0, score: 20},
@@ -18,15 +23,7 @@ export default class Game extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image("sky", "./assets/image/sky.png");
-    this.load.image("ground", "./assets/image/platform.png");
-    this.load.image("ninja", "./assets/image/ninja.png");
-    this.load.image("keyR", "./assets/image/keyR.png");
-    this.load.image(SQUARE, "./assets/image/square.png");
-    this.load.image(TRIANGLE, "./assets/image/triangle.png");
-    this.load.image(DIAMOND, "./assets/image/diamond.png");
-    this.load.image("win", "./assets/image/win.png");
-    this.load.image("bgMenu", "./assets/image/bgMenu.jpg");
+
   }
 
   create() {
@@ -46,9 +43,17 @@ export default class Game extends Phaser.Scene {
 
     //create events to add shapes
     this.time.addEvent({
-      delay: 1500,
+      delay: 3000,
       callback: this.addShape, //cada vez que pase el tiempo se ejecuta esta funcion
       callbackScope: this, //callBackScope hace que el this haga referencia a la escena
+      loop: true,
+    });
+
+    //create events to timer
+    this.time.addEvent({
+      delay: 1000,
+      callback: this.onSecond,
+      callbackScope: this, 
       loop: true,
     });
 
@@ -76,9 +81,24 @@ export default class Game extends Phaser.Scene {
       fontStyle: "bold",
       fill: "#FFF"
     });
+
+    //add timer
+    this.timer = 20;
+    this.timerText = this.add.text(750, 20, this.timer,{
+      fontSize: "32px",
+      fontStyle: "bold",
+      fill: "#FFF"
+    });
   }
 
   update() {
+    if(this.score>200){
+      this.scene.start("Win");
+    }
+
+    if(this.gameOver){
+      this.scene.start("GameOver");
+    }
     //update player movement
     if (this.cursors.left.isDown) {
       this.player.setVelocityX(-250);
@@ -95,13 +115,13 @@ export default class Game extends Phaser.Scene {
 
   addShape() {
     //get random shape
-    const randomShape = Phaser.Math.RND.pick([DIAMOND, SQUARE, TRIANGLE]); //selecciona aleatoriamente una forma
+    const randomShape = Phaser.Math.RND.pick([SHAPES.DIAMOND, SHAPES.SQUARE, SHAPES.TRIANGLE]); //selecciona aleatoriamente una forma
 
     //get random position x
     const randomX = Phaser.Math.RND.between(32, 768);
 
     // add shape to screen
-    this.shapesGroup.create(randomX, 0, randomShape).setCircle(25,7,7);;  
+    this.shapesGroup.create(randomX, 0, randomShape).setCircle(25,7,7);  
 
     console.log("shape is added", randomX, randomShape);
   }
@@ -117,5 +137,13 @@ export default class Game extends Phaser.Scene {
     this.scoreText.setText(`Score: ${this.score.toString()}`);//convierte la variable a un string
 
     console.log(this.shapeRecolected);
+  }
+
+  onSecond(){
+    this.timer--;
+    this.timerText.setText(this.timer);
+    if(this.timer <= 0){
+      this.gameOver = true;
+    }
   }
 }
