@@ -1,7 +1,9 @@
 import {SHAPES} from '../../util.js';
 
-const {TRIANGLE, SQUARE, DIAMOND} = SHAPES;
-
+const {TRIANGLE, SQUARE, DIAMOND, RED_DIAMOND} = SHAPES;
+/*
+  QUE EL USUARIO GANE CUANDO JUNTE DETERMINADA CANTIDAD DE SHAPES.
+*/
 
 export default class Game extends Phaser.Scene {
   //export default para poder importar desde otra clase
@@ -33,6 +35,8 @@ export default class Game extends Phaser.Scene {
     //add static platforms group
     let platforms = this.physics.add.staticGroup();
     platforms.create(400, 568, "ground").setScale(2).refreshBody();
+    platforms.create(400,380, "ground").setScale(0.7).refreshBody();
+    platforms.create(660,210, "ground").setScale(0.7).refreshBody();
 
     //add sprites player
     this.player = this.physics.add.sprite(100, 450, "ninja");
@@ -73,6 +77,14 @@ export default class Game extends Phaser.Scene {
       null,
       this
     );
+
+    /*this.physics.add.overlap(//cuando se da el contacto llama una funcion
+      this.shapesGroup,
+      platforms,
+      this.reduceScore,
+      null,
+      this
+    );*/
 
     //add socre on scene
     this.score = 0;
@@ -115,14 +127,14 @@ export default class Game extends Phaser.Scene {
 
   addShape() {
     //get random shape
-    const randomShape = Phaser.Math.RND.pick([SHAPES.DIAMOND, SHAPES.SQUARE, SHAPES.TRIANGLE]); //selecciona aleatoriamente una forma
+    const randomShape = Phaser.Math.RND.pick([SHAPES.DIAMOND, SHAPES.SQUARE, SHAPES.TRIANGLE, SHAPES.RED_DIAMOND]); //selecciona aleatoriamente una forma
 
     //get random position x
     const randomX = Phaser.Math.RND.between(32, 768);
-
+    
     // add shape to screen
-    this.shapesGroup.create(randomX, 0, randomShape).setCircle(25,7,7);  
-
+    this.shapesGroup.create(randomX, 0, randomShape).setCircle(25,7,7).setBounce(0.5,0.5);  
+    
     console.log("shape is added", randomX, randomShape);
   }
 
@@ -139,6 +151,16 @@ export default class Game extends Phaser.Scene {
     console.log(this.shapeRecolected);
   }
 
+  /*reduceScore(shape){
+    const shapeName2 = shape.texture.key;
+    this.shapesRecolected[shapeName2].count++;
+
+    this.score = this.shapesRecolected[shapeName2].score;
+    this.scoreText.setText(`Score: ${this.score.toString()}`);
+
+    console.log(this.shapeRecolected);
+  }*/
+  
   onSecond(){
     this.timer--;
     this.timerText.setText(this.timer);
