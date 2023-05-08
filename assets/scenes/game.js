@@ -19,7 +19,8 @@ export default class Game extends Phaser.Scene {
     this.shapesRecolected = {
       [TRIANGLE]: {count: 0, score: 10},
       [SQUARE]: {count: 0, score: 20},
-      [DIAMOND]: {count: 0, score: 30}
+      [DIAMOND]: {count: 0, score: 30},
+      [RED_DIAMOND]: {count: 0, score: -10}
     };
     console.log(this.shapesRecolected);
   }
@@ -44,6 +45,7 @@ export default class Game extends Phaser.Scene {
 
     //add shapes group
     this.shapesGroup = this.physics.add.group();
+  
 
     //create events to add shapes
     this.time.addEvent({
@@ -95,7 +97,7 @@ export default class Game extends Phaser.Scene {
     });
 
     //add timer
-    this.timer = 20;
+    this.timer = 40;
     this.timerText = this.add.text(750, 20, this.timer,{
       fontSize: "32px",
       fontStyle: "bold",
@@ -133,7 +135,7 @@ export default class Game extends Phaser.Scene {
     const randomX = Phaser.Math.RND.between(32, 768);
     
     // add shape to screen
-    this.shapesGroup.create(randomX, 0, randomShape).setCircle(25,7,7).setBounce(0.5,0.5);  
+    this.shapesGroup.create(randomX, 0, randomShape).setCircle(27,9,9).setBounce(0.5,0.5);  
     
     console.log("shape is added", randomX, randomShape);
   }
