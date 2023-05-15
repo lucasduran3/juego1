@@ -13,11 +13,12 @@ export default class Preload extends Phaser.Scene{
         this.load.image(SQUARE, "./assets/image/square.png");
         this.load.image(TRIANGLE, "./assets/image/triangle.png");
         this.load.image(DIAMOND, "./assets/image/diamond.png");
-        this.load.image(RED_DIAMOND, "./assets/image/redDiamond.png")
+        this.load.image(RED_DIAMOND, "./assets/image/redDiamond.png");
         this.load.image("win", "./assets/image/win.png");
-        this.load.image("bgMenu", "./assets/image/bgMenu.jpg");
+        this.load.image("over", "./assets/image/gameOver.png");
+        this.load.image("start", "./assets/image/start.png");
       }
     create(){
-        this.scene.start("Game");
+        this.scene.start("Start");
     }
 }

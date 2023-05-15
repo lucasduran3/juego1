@@ -1,9 +1,6 @@
-import {SHAPES} from '../../util.js';
+import {SHAPES, POINTS_PERCENTAJE, POINTS_PERCENTAJE_VALUE_START} from '../../util.js';
 
 const {TRIANGLE, SQUARE, DIAMOND, RED_DIAMOND} = SHAPES;
-/*
-  QUE EL USUARIO GANE CUANDO JUNTE DETERMINADA CANTIDAD DE SHAPES.
-*/
 
 export default class Game extends Phaser.Scene {
   //export default para poder importar desde otra clase
@@ -36,8 +33,9 @@ export default class Game extends Phaser.Scene {
     //add static platforms group
     let platforms = this.physics.add.staticGroup();
     platforms.create(400, 568, "ground").setScale(2).refreshBody();
-    platforms.create(400,380, "ground").setScale(0.7).refreshBody();
-    platforms.create(660,210, "ground").setScale(0.7).refreshBody();
+    platforms.create(50, 250, 'ground');
+    platforms.create(400,380, "ground");
+    platforms.create(660,210, "ground");
 
     //add sprites player
     this.player = this.physics.add.sprite(100, 450, "ninja");
@@ -49,7 +47,7 @@ export default class Game extends Phaser.Scene {
 
     //create events to add shapes
     this.time.addEvent({
-      delay: 3000,
+      delay: 1500,
       callback: this.addShape, //cada vez que pase el tiempo se ejecuta esta funcion
       callbackScope: this, //callBackScope hace que el this haga referencia a la escena
       loop: true,
@@ -80,13 +78,13 @@ export default class Game extends Phaser.Scene {
       this
     );
 
-    /*this.physics.add.overlap(//cuando se da el contacto llama una funcion
+    this.physics.add.overlap(
       this.shapesGroup,
       platforms,
-      this.reduceScore,
+      this.reduce,
       null,
       this
-    );*/
+    );
 
     //add socre on scene
     this.score = 0;
@@ -97,7 +95,7 @@ export default class Game extends Phaser.Scene {
     });
 
     //add timer
-    this.timer = 40;
+    this.timer = 30;
     this.timerText = this.add.text(750, 20, this.timer,{
       fontSize: "32px",
       fontStyle: "bold",
@@ -135,7 +133,7 @@ export default class Game extends Phaser.Scene {
     const randomX = Phaser.Math.RND.between(32, 768);
     
     // add shape to screen
-    this.shapesGroup.create(randomX, 0, randomShape).setCircle(27,9,9).setBounce(0.5,0.5);  
+    this.shapesGroup.create(randomX, 0, randomShape).setCircle(32,0,0).setBounce(0.5).setData(POINTS_PERCENTAJE, POINTS_PERCENTAJE_VALUE_START);  
     
     console.log("shape is added", randomX, randomShape);
   }
@@ -143,26 +141,43 @@ export default class Game extends Phaser.Scene {
   collectShape(player, shape){
     //remove shape from screen
     shape.disableBody(true, true);
-    const shapeName = shape.texture.key; 
-    this.shapesRecolected[shapeName].count++;
+    const shapeName = shape.texture.key;
+    const percentage = shape.getData(POINTS_PERCENTAJE);
+    const scoreNow = this.shapesRecolected[shapeName].score * percentage;
+    this.score += scoreNow;
 
+    /*
+    this.shapesRecolected[shapeName].count++;
     this.score += this.shapesRecolected[shapeName].score;
     console.log(this.shapesRecolected[shapeName].score);
+    */
+
     this.scoreText.setText(`Score: ${this.score.toString()}`);//convierte la variable a un string
+    this.shapesRecolected[shapeName].count++;
 
     console.log(this.shapeRecolected);
   }
 
-  /*reduceScore(shape){
-    const shapeName2 = shape.texture.key;
-    this.shapesRecolected[shapeName2].count++;
+  reduce(shape, platform){
+    const newPercentage = shape.getData(POINTS_PERCENTAJE) - 0.25;
+    console.log(shape.texture.key, newPercentage);
+    shape.setData(POINTS_PERCENTAJE, newPercentage);
+    if(newPercentage <= 0){
+      shape.disableBody(true, true);
+      return;
+    }
 
-    this.score = this.shapesRecolected[shapeName2].score;
-    this.scoreText.setText(`Score: ${this.score.toString()}`);
+    const  text = this.add.text(shape.body.position.x+10, shape.body.position.y, "- 25%",{
+      fontSize: "22px",
+      fontStyle: "bold",
+      fill: "red",
+    });
 
-    console.log(this.shapeRecolected);
-  }*/
-  
+    setTimeout(() => {
+      text.destroy();
+    }, 200);
+  }
+
   onSecond(){
     this.timer--;
     this.timerText.setText(this.timer);
