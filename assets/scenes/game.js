@@ -1,25 +1,30 @@
-import {SHAPES, POINTS_PERCENTAJE, POINTS_PERCENTAJE_VALUE_START} from '../../util.js';
+import { SHAPES, POINTS_PERCENTAJE, POINTS_PERCENTAJE_VALUE_START } from '../../util.js';
 
-const {TRIANGLE, SQUARE, DIAMOND, RED_DIAMOND} = SHAPES;
+const { TRIANGLE, SQUARE, DIAMOND, RED_DIAMOND } = SHAPES;
 
 export default class Game extends Phaser.Scene {
   //export default para poder importar desde otra clase
   score;
   gameOver;
   timer;
+  audio;
+  soundCollect;
+  soundJump;
   constructor() {
     super("Game");
+
   }
 
   init() {
     this.gameOver = false;
     this.shapesRecolected = {
-      [TRIANGLE]: {count: 0, score: 10},
-      [SQUARE]: {count: 0, score: 20},
-      [DIAMOND]: {count: 0, score: 30},
-      [RED_DIAMOND]: {count: 0, score: -10}
+      [TRIANGLE]: { count: 0, score: 10 },
+      [SQUARE]: { count: 0, score: 20 },
+      [DIAMOND]: { count: 0, score: 30 },
+      [RED_DIAMOND]: { count: 0, score: -10 }
     };
     console.log(this.shapesRecolected);
+    console.log(this.sound);
   }
 
   preload() {
@@ -27,15 +32,22 @@ export default class Game extends Phaser.Scene {
   }
 
   create() {
+    this.audio = this.sound.add('musicGame', { loop: false });
+    this.soundCollect = this.sound.add('collectSound');
+    this.soundJump = this.sound.add('jumpPlayer').setVolume(0.3);
+    this.audio.stop();
+    this.audio.play();
+    this.audio.setVolume(0.2);
+    this.soundCollect.setVolume(0.5);
     //add background
     this.add.image(400, 300, "sky").setScale(0.555);
 
     //add static platforms group
     let platforms = this.physics.add.staticGroup();
+    console.log(platforms);
     platforms.create(400, 568, "ground").setScale(2).refreshBody();
-    platforms.create(50, 250, 'ground');
-    platforms.create(400,380, "ground");
-    platforms.create(660,210, "ground");
+    platforms.create(40, 380, "ground");
+    platforms.create(660, 210, "ground");
 
     //add sprites player
     this.player = this.physics.add.sprite(100, 450, "ninja");
@@ -43,11 +55,11 @@ export default class Game extends Phaser.Scene {
 
     //add shapes group
     this.shapesGroup = this.physics.add.group();
-  
+
 
     //create events to add shapes
     this.time.addEvent({
-      delay: 1500,
+      delay: 2500,
       callback: this.addShape, //cada vez que pase el tiempo se ejecuta esta funcion
       callbackScope: this, //callBackScope hace que el this haga referencia a la escena
       loop: true,
@@ -57,7 +69,7 @@ export default class Game extends Phaser.Scene {
     this.time.addEvent({
       delay: 1000,
       callback: this.onSecond,
-      callbackScope: this, 
+      callbackScope: this,
       loop: true,
     });
 
@@ -88,7 +100,7 @@ export default class Game extends Phaser.Scene {
 
     //add socre on scene
     this.score = 0;
-    this.scoreText = this.add.text(20, 20, "Score:" + this.score,{
+    this.scoreText = this.add.text(20, 20, "Score:" + this.score, {
       fontSize: "32px",
       fontStyle: "bold",
       fill: "#FFF"
@@ -96,7 +108,7 @@ export default class Game extends Phaser.Scene {
 
     //add timer
     this.timer = 30;
-    this.timerText = this.add.text(750, 20, this.timer,{
+    this.timerText = this.add.text(750, 20, this.timer, {
       fontSize: "32px",
       fontStyle: "bold",
       fill: "#FFF"
@@ -104,12 +116,14 @@ export default class Game extends Phaser.Scene {
   }
 
   update() {
-    if(this.score>200){
+    if (this.score > 100) {
       this.scene.start("Win");
+      this.audio.stop();
     }
 
-    if(this.gameOver){
+    if (this.gameOver) {
       this.scene.start("GameOver");
+      this.audio.stop();
     }
     //update player movement
     if (this.cursors.left.isDown) {
@@ -122,6 +136,7 @@ export default class Game extends Phaser.Scene {
     //update player jump
     if (this.cursors.up.isDown && this.player.body.touching.down) {
       this.player.setVelocityY(-300);
+      this.soundJump.play();
     }
   }
 
@@ -131,14 +146,14 @@ export default class Game extends Phaser.Scene {
 
     //get random position x
     const randomX = Phaser.Math.RND.between(32, 768);
-    
+
     // add shape to screen
-    this.shapesGroup.create(randomX, 0, randomShape).setCircle(32,0,0).setBounce(0.5).setData(POINTS_PERCENTAJE, POINTS_PERCENTAJE_VALUE_START);  
-    
+    this.shapesGroup.create(randomX, 0, randomShape).setCircle(32, 0, 0).setBounce(0.5).setData(POINTS_PERCENTAJE, POINTS_PERCENTAJE_VALUE_START);
+
     console.log("shape is added", randomX, randomShape);
   }
 
-  collectShape(player, shape){
+  collectShape(player, shape) {
     //remove shape from screen
     shape.disableBody(true, true);
     const shapeName = shape.texture.key;
@@ -154,20 +169,21 @@ export default class Game extends Phaser.Scene {
 
     this.scoreText.setText(`Score: ${this.score.toString()}`);//convierte la variable a un string
     this.shapesRecolected[shapeName].count++;
+    this.soundCollect.play();
 
     console.log(this.shapeRecolected);
   }
 
-  reduce(shape, platform){
+  reduce(shape, platform) {
     const newPercentage = shape.getData(POINTS_PERCENTAJE) - 0.25;
     console.log(shape.texture.key, newPercentage);
     shape.setData(POINTS_PERCENTAJE, newPercentage);
-    if(newPercentage <= 0){
+    if (newPercentage <= 0) {
       shape.disableBody(true, true);
       return;
     }
 
-    const  text = this.add.text(shape.body.position.x+10, shape.body.position.y, "- 25%",{
+    const text = this.add.text(shape.body.position.x + 10, shape.body.position.y, "- 25%", {
       fontSize: "22px",
       fontStyle: "bold",
       fill: "red",
@@ -178,10 +194,10 @@ export default class Game extends Phaser.Scene {
     }, 200);
   }
 
-  onSecond(){
+  onSecond() {
     this.timer--;
     this.timerText.setText(this.timer);
-    if(this.timer <= 0){
+    if (this.timer <= 0) {
       this.gameOver = true;
     }
   }
