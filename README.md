@@ -1,7 +1,7 @@
 # TP N°1 - Phaser
 
-*Materia*: Programación 1.
+**Materia**:  `#f0a2bb` Programación 1.
 
-*Docentes*: Nicolas Nocete, Federico Degiovanni.
+**Docentes**: Nicolas Nocete, Federico Degiovanni.
 
-*Alumno*: Lucas Durán.
+**Alumno**: Lucas Durán.
