@@ -1,5 +1,5 @@
-# Phaser 3 Template
+# TP N°1 Phaser
 
-Plantilla para iniciar nuevos proyectos con PHASER 3.
-
-Contiene configuración inicial y buenas prácticas de estructuras de carpetas.
+Materia: Programación 1.
+Docentes: Nicolas Nocete, Federico Degiovanni.
+Alumno: Lucas Durán.
