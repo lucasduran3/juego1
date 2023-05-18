@@ -32,7 +32,7 @@ export default class Game extends Phaser.Scene {
   }
 
   create() {
-    this.audio = this.sound.add('musicGame', { loop: false });
+    this.audio = this.sound.add('musicGame', { loop: true});
     this.soundCollect = this.sound.add('collectSound');
     this.soundJump = this.sound.add('jumpPlayer').setVolume(0.3);
     this.audio.stop();
